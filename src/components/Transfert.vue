@@ -1,0 +1,93 @@
+<template>
+  <div :style="{ display: 'flex', justifyContent: 'space-between' }">
+    <div>Transfer</div>
+    <router-link to="list">List</router-link>
+  </div>
+  <a-space
+    :style="{ width: '100%', justifyContent: 'center', marginTop: '30px' }"
+  >
+    <a-transfer
+      :data-source="mockData"
+      :titles="['Source', 'Target']"
+      :target-keys="targetKeys"
+      :selected-keys="selectedKeys"
+      :render="(item: any) => item.title"
+      :disabled="disabled"
+      @change="handleChange"
+      @selectChange="handleSelectChange"
+      @scroll="handleScroll"
+    />
+  </a-space>
+  <a-space
+    :style="{
+      width: '100%',
+      justifyContent: 'center',
+      marginTop: '15px',
+    }"
+  >
+    <a-switch
+      :style="{ marginTop: '50px', margin: '0 auto' }"
+      un-checked-children="enabled"
+      checked-children="disabled"
+      v-model:checked="disabled"
+      style="margin-top: 16px"
+    />
+  </a-space>
+</template>
+<script lang="ts" setup>
+import { ref } from "vue";
+
+interface MockData {
+  key: string;
+  title: string;
+  description: string;
+  disabled: boolean;
+}
+const mockData: MockData[] = [];
+for (let i = 0; i < 20; i++) {
+  mockData.push({
+    key: i.toString(),
+    title: `content${i + 1}`,
+    description: `description of content${i + 1}`,
+    disabled: i % 3 < 1,
+  });
+}
+
+const oriTargetKeys = mockData
+  .filter((item) => +item.key % 3 > 1)
+  .map((item) => item.key);
+const disabled = ref<boolean>(false);
+
+const targetKeys = ref<string[]>(oriTargetKeys);
+
+const selectedKeys = ref<string[]>(["1", "4"]);
+
+const handleChange = (
+  nextTargetKeys: string[],
+  direction: string,
+  moveKeys: string[]
+) => {
+  targetKeys.value = nextTargetKeys;
+  console.log("targetKeys: ", nextTargetKeys);
+  console.log("direction: ", direction);
+  console.log("moveKeys: ", moveKeys);
+};
+const handleSelectChange = (
+  sourceSelectedKeys: string[],
+  targetSelectedKeys: string[]
+) => {
+  selectedKeys.value = [...sourceSelectedKeys, ...targetSelectedKeys];
+  console.log("sourceSelectedKeys: ", sourceSelectedKeys);
+  console.log("targetSelectedKeys: ", targetSelectedKeys);
+};
+const handleScroll = (direction: string, e: Event) => {
+  console.log("direction:", direction);
+  console.log("target:", e.target);
+};
+</script>
+
+<style>
+.ant-transfer-list {
+  width: 300px !important;
+}
+</style>
